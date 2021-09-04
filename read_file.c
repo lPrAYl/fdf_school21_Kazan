@@ -1,5 +1,4 @@
 #include "fdf.h"
-#include "ft_printf/ft_print.h"
 
 static unsigned int	ft_count_substr(char const *s, char c)
 {
@@ -30,7 +29,7 @@ int	get_height(char *file_name)
 
 	fd = open(file_name, O_RDONLY, 0);
 	height = 0;
-	while(get_next_line(fd, &line))
+	while (get_next_line(fd, &line))
 	{
 		height++;
 		free(line);
@@ -42,13 +41,13 @@ int	get_height(char *file_name)
 
 int	get_width(char *file_name)
 {
-	int	width;
-	int	fd;
+	int		width;
+	int		fd;
 	char	*line;
 
 	fd = open(file_name, O_RDONLY, 0);
 	get_next_line(fd, &line);
-	width = ft_count_substr(line, ' '); // look your ft_strsplit()
+	width = ft_count_substr(line, ' ');
 	free(line);
 	close(fd);
 	return (width);
@@ -70,27 +69,26 @@ void	fill_matrix(int *z_line, char *line)
 	free(nums);
 }
 
-void	read_file(char *file_name, fdf *data)
+void	read_file(char *file_name, t_fdf *data)
 {
 	int		i;
 	int		fd;
 	char	*line;
 
+	if (ft_strncmp(&file_name[ft_strlen(file_name) - 4], ".fdf", 4))
+		ft_error("Wrong name file");
+	fd = open(file_name, O_RDONLY, 0);
+	if (fd < 0)
+		ft_error(NULL);
 	data->height = get_height(file_name);
 	data->width = get_width(file_name);
-
 	data->z_matrix = (int **)malloc(sizeof(int **) * (data->height + 1));
 	i = 0;
 	while (i <= data->height)
 		data->z_matrix[i++] = (int *)malloc(sizeof(int *) * (data->width + 1));
-	fd = open(file_name, O_RDONLY, 0);
 	i = 0;
 	while (get_next_line(fd, &line))
-	{
-		fill_matrix(data->z_matrix[i], line);
-		free(line);
-		i++;
-	}
+		fill_matrix(data->z_matrix[i++], line), free(line);
 	free(line);
 	close(fd);
 	free (data->z_matrix[i]);
